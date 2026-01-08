@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { PriceChart } from "./PriceChart";
 import sneakersData from "../data/sneakers.json";
 
 type Sneaker = typeof sneakersData[0];
@@ -325,7 +326,7 @@ export function CompareModal({
           </div>
 
           {/* Design & Collaboration */}
-          <div className="border-2 border-border bg-muted/10 p-6 mb-6">
+          <div className="border-2 border-border bg-muted/10 p-6">
             <h4 className="text-sm font-bold uppercase tracking-tight mb-4">DESIGN & COLLABORATION</h4>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {selectedSneakers.map((sneaker) => (
@@ -343,6 +344,26 @@ export function CompareModal({
                     <div className="font-bold text-xs">{sneaker.status}</div>
                   </div>
                 </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Price History Charts */}
+          <div className="border-2 border-border bg-muted/10 p-6">
+            <h4 className="text-sm font-bold uppercase tracking-tight mb-6 flex items-center gap-2">
+              <TrendingUp className="h-4 w-4" /> PRICE HISTORY & MARKET TRENDS
+            </h4>
+            <div className="space-y-8">
+              {selectedSneakers.map((sneaker) => (
+                <PriceChart
+                  key={sneaker.id}
+                  modelId={sneaker.id}
+                  modelName={sneaker.model}
+                  msrp={sneaker.price}
+                  resalePrice={sneaker.resalePrice}
+                  premium={sneaker.premium}
+                  demand={sneaker.demand}
+                />
               ))}
             </div>
           </div>
