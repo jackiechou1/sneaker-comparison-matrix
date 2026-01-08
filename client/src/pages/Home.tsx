@@ -12,7 +12,8 @@ import {
   X,
   Zap,
   CheckSquare,
-  Square
+  Square,
+  Heart
 } from "lucide-react";
 import { 
   Table, 
@@ -47,6 +48,8 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { CompareModal } from "@/components/CompareModal";
+import { FavoritesDialog } from "@/components/FavoritesDialog";
+import { useFavorites } from "@/hooks/useFavorites";
 import sneakersData from "../data/sneakers.json";
 
 // Types
@@ -64,6 +67,7 @@ export default function Home() {
   const [selectedSneaker, setSelectedSneaker] = useState<Sneaker | null>(null);
   const [compareMode, setCompareMode] = useState(false);
   const [selectedForCompare, setSelectedForCompare] = useState<number[]>([]);
+  const { favorites, toggleFavorite, removeFavorite, clearFavorites } = useFavorites();
 
   // Extract unique brands
   const brands = useMemo(() => {
@@ -192,6 +196,14 @@ export default function Home() {
                 ))}
               </SelectContent>
             </Select>
+
+            <FavoritesDialog
+              favorites={favorites}
+              onRemoveFavorite={removeFavorite}
+              onClearFavorites={clearFavorites}
+              onSelectForCompare={toggleCompareSelection}
+              selectedForCompare={selectedForCompare}
+            />
           </div>
         </div>
       </header>
@@ -233,10 +245,10 @@ export default function Home() {
           <Table>
             <TableHeader className="bg-muted/30">
               <TableRow className="hover:bg-transparent border-b-2 border-border">
-                <TableHead className="w-[40px] font-bold text-foreground border-r border-border/50 text-center">
-                  <span className="text-xs">SEL</span>
+                <TableHead className="w-[60px] font-bold text-foreground border-r border-border/50 text-center">
+                  <span className="text-xs">ACT</span>
                 </TableHead>
-                <TableHead className="w-[50px] font-bold text-foreground border-r border-border/50">#</TableHead>
+                <TableHead className="w-[45px] font-bold text-foreground border-r border-border/50">#</TableHead>
                 <TableHead 
                   className="w-[200px] font-bold text-foreground cursor-pointer hover:bg-accent/50 border-r border-border/50"
                   onClick={() => handleSort("model")}
@@ -289,19 +301,33 @@ export default function Home() {
                     }`}
                   >
                     <TableCell className="text-center border-r border-border/50">
-                      <button
-                        onClick={() => toggleCompareSelection(sneaker.id)}
-                        className="inline-flex items-center justify-center h-5 w-5 rounded-none hover:bg-primary/20 transition-colors"
-                        disabled={!isSelected && selectedForCompare.length >= 3}
-                      >
-                        {isSelected ? (
-                          <CheckSquare className="h-4 w-4 text-primary" />
-                        ) : (
-                          <Square className="h-4 w-4 text-muted-foreground" />
-                        )}
-                      </button>
+                      <div className="flex items-center justify-center gap-1">
+                        <button
+                          onClick={() => toggleCompareSelection(sneaker.id)}
+                          className="inline-flex items-center justify-center h-5 w-5 rounded-none hover:bg-primary/20 transition-colors"
+                          disabled={!isSelected && selectedForCompare.length >= 3}
+                          title="Add to comparison"
+                        >
+                          {isSelected ? (
+                            <CheckSquare className="h-4 w-4 text-primary" />
+                          ) : (
+                            <Square className="h-4 w-4 text-muted-foreground" />
+                          )}
+                        </button>
+                        <button
+                          onClick={() => toggleFavorite(sneaker.id)}
+                          className="inline-flex items-center justify-center h-5 w-5 rounded-none hover:bg-secondary/20 transition-colors"
+                          title="Add to favorites"
+                        >
+                          {favorites.includes(sneaker.id) ? (
+                            <Heart className="h-4 w-4 text-secondary fill-secondary" />
+                          ) : (
+                            <Heart className="h-4 w-4 text-muted-foreground" />
+                          )}
+                        </button>
+                      </div>
                     </TableCell>
-                    <TableCell className="font-medium border-r border-border/50 text-muted-foreground">
+                    <TableCell className="font-medium border-r border-border/50 text-muted-foreground text-xs">
                       {String(index + 1).padStart(2, '0')}
                     </TableCell>
                     <TableCell className="font-bold border-r border-border/50 group-hover:text-primary transition-colors">
