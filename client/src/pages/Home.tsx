@@ -2,7 +2,6 @@ import { useState, useMemo } from "react";
 import { 
   ArrowUpDown, 
   Search, 
-  Filter, 
   Info, 
   TrendingUp, 
   DollarSign, 
@@ -50,6 +49,7 @@ import {
 import { CompareModal } from "@/components/CompareModal";
 import { FavoritesDialog } from "@/components/FavoritesDialog";
 import { useFavorites } from "@/hooks/useFavorites";
+import { useLocation } from "wouter";
 import sneakersData from "../data/sneakers.json";
 
 // Types
@@ -58,6 +58,7 @@ type SortKey = keyof Sneaker;
 type SortOrder = "asc" | "desc";
 
 export default function Home() {
+  const [, setLocation] = useLocation();
   const [searchTerm, setSearchTerm] = useState("");
   const [brandFilter, setBrandFilter] = useState<string>("all");
   const [sortConfig, setSortConfig] = useState<{ key: SortKey; order: SortOrder }>({ 
@@ -164,7 +165,10 @@ export default function Home() {
       {/* Header */}
       <header className="border-b-2 border-border bg-background sticky top-0 z-10">
         <div className="container py-4 flex flex-col md:flex-row justify-between items-center gap-4">
-          <div className="flex items-center gap-2">
+          <button
+            onClick={() => setLocation("/")}
+            className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+          >
             <div className="bg-primary text-primary-foreground p-2 font-mono font-bold text-xl">
               SM-50
             </div>
@@ -172,7 +176,7 @@ export default function Home() {
               <h1 className="text-xl font-bold uppercase tracking-tight">Sneaker Matrix</h1>
               <p className="text-xs text-muted-foreground font-mono">Consumer Footwear Analysis Database</p>
             </div>
-          </div>
+          </button>
           
           <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
             <div className="relative w-full sm:w-64">
@@ -204,6 +208,13 @@ export default function Home() {
               onSelectForCompare={toggleCompareSelection}
               selectedForCompare={selectedForCompare}
             />
+
+            <Button
+              onClick={() => setLocation("/rankings")}
+              className="rounded-none border-2 border-border bg-secondary hover:bg-secondary/90 text-secondary-foreground font-mono text-xs font-bold"
+            >
+              📊 RANKINGS
+            </Button>
           </div>
         </div>
       </header>
