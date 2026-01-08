@@ -52,8 +52,10 @@ import { FavoritesDialog } from "@/components/FavoritesDialog";
 import { ReviewForm } from "@/components/ReviewForm";
 import { ReviewsList } from "@/components/ReviewsList";
 import { RatingSummary } from "@/components/RatingSummary";
+import { PriceAlertDialog } from "@/components/PriceAlertDialog";
 import { useFavorites } from "@/hooks/useFavorites";
 import { useReviews } from "@/hooks/useReviews";
+import { usePriceAlerts } from "@/hooks/usePriceAlerts";
 import { useLocation } from "wouter";
 import sneakersData from "../data/sneakers.json";
 
@@ -221,6 +223,13 @@ export default function Home() {
               className="rounded-none border-2 border-border bg-secondary hover:bg-secondary/90 text-secondary-foreground font-mono text-xs font-bold"
             >
               📊 RANKINGS
+            </Button>
+
+            <Button
+              onClick={() => setLocation("/alerts")}
+              className="rounded-none border-2 border-border bg-accent hover:bg-accent/90 text-accent-foreground font-mono text-xs font-bold"
+            >
+              🔔 ALERTS
             </Button>
           </div>
         </div>
@@ -434,6 +443,8 @@ export default function Home() {
 
 function SneakerDetailDialog({ sneaker }: { sneaker: Sneaker }) {
   const { reviews, addReview, deleteReview, markHelpful, averageRating, averageAspects, ratingDistribution, totalReviews } = useReviews(sneaker.id);
+  const { alerts, addAlert, deleteAlert, resetAlert, getActiveAlerts } = usePriceAlerts();
+  const activeAlerts = getActiveAlerts(sneaker.id);
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat("en-US", {
@@ -458,13 +469,22 @@ function SneakerDetailDialog({ sneaker }: { sneaker: Sneaker }) {
             </DialogDescription>
           </div>
           <div className="text-right">
-            <div className="text-3xl font-bold font-mono text-primary">
-              {formatCurrency(sneaker.price)}
+                <div className="text-3xl font-bold font-mono text-primary">
+                  {formatCurrency(sneaker.price)}
+                </div>
+                <div className="text-xs font-mono text-muted-foreground">MSRP</div>
+              </div>
             </div>
-            <div className="text-xs font-mono text-muted-foreground">MSRP</div>
-          </div>
-        </div>
-      </DialogHeader>
+            <PriceAlertDialog
+              sneakerId={sneaker.id}
+              sneakerModel={sneaker.model}
+              currentPrice={sneaker.resalePrice}
+              activeAlerts={activeAlerts}
+              onAddAlert={(targetPrice) => addAlert(sneaker.id, sneaker.model, targetPrice, sneaker.resalePrice)}
+              onDeleteAlert={deleteAlert}
+              onResetAlert={resetAlert}
+            />
+          </DialogHeader>
 
       <Tabs defaultValue="overview" className="w-full">
         <TabsList className="w-full rounded-none border-b-2 border-border bg-muted/20 grid grid-cols-3 sticky top-[100px] z-10">
