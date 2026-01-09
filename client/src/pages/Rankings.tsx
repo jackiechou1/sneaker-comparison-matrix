@@ -3,6 +3,7 @@ import { ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLocation } from "wouter";
 import { CommunityRankings } from "@/components/CommunityRankings";
+import { RankingsShare } from "@/components/RankingsShare";
 import { useCommunityRankings } from "@/hooks/useCommunityRankings";
 import sneakersData from "../data/sneakers.json";
 
@@ -36,6 +37,9 @@ export default function Rankings() {
 
       {/* Main Content */}
       <main className="flex-1 container py-8">
+        <div className="mb-6 flex justify-end">
+          <RankingsShare rankings={rankings} />
+        </div>
         <CommunityRankings rankings={rankings} />
       </main>
     </div>

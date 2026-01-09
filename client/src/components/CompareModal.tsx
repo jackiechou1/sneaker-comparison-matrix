@@ -5,7 +5,8 @@ import {
   Activity, 
   DollarSign,
   CheckCircle2,
-  Circle
+  Circle,
+  Share2
 } from "lucide-react";
 import {
   Dialog,
@@ -16,6 +17,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { PriceChart } from "./PriceChart";
+import { ShareDialog } from "@/components/ShareDialog";
+import { useShare } from "@/hooks/useShare";
 import sneakersData from "../data/sneakers.json";
 
 type Sneaker = typeof sneakersData[0];
@@ -33,7 +36,17 @@ export function CompareModal({
   selectedIds, 
   onRemove 
 }: CompareModalProps) {
+  const { generateCompareLink, generateCompareReport } = useShare();
   const selectedSneakers = sneakersData.filter(s => selectedIds.includes(s.id));
+
+  const shareLink = generateCompareLink(selectedIds);
+  const shareReport = generateCompareReport(
+    selectedSneakers,
+    `Comparing ${selectedSneakers.length} Sneakers`
+  );
+  const shareTitle = `Sneaker Comparison: ${selectedSneakers
+    .map((s) => s.model)
+    .join(" vs ")}`;
 
   if (selectedSneakers.length === 0) return null;
 
@@ -72,14 +85,22 @@ export function CompareModal({
             <DialogTitle className="text-2xl font-bold uppercase tracking-tight">
               COMPARISON MATRIX
             </DialogTitle>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8 rounded-none hover:bg-primary hover:text-primary-foreground"
-              onClick={() => onOpenChange(false)}
-            >
-              <X className="h-4 w-4" />
-            </Button>
+            <div className="flex gap-2">
+              <ShareDialog
+                title={shareTitle}
+                text={shareReport}
+                url={shareLink}
+                triggerLabel="SHARE"
+              />
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 rounded-none hover:bg-primary hover:text-primary-foreground"
+                onClick={() => onOpenChange(false)}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
           <p className="text-xs font-mono text-muted-foreground mt-2">
             DETAILED SIDE-BY-SIDE ANALYSIS OF {selectedSneakers.length} MODELS
