@@ -56,6 +56,8 @@ import { PriceAlertDialog } from "@/components/PriceAlertDialog";
 import { useFavorites } from "@/hooks/useFavorites";
 import { useReviews } from "@/hooks/useReviews";
 import { usePriceAlerts } from "@/hooks/usePriceAlerts";
+import { useAdvancedFilters } from "@/hooks/useAdvancedFilters";
+import { AdvancedFilterPanel } from "@/components/AdvancedFilterPanel";
 import { useLocation } from "wouter";
 import sneakersData from "../data/sneakers.json";
 
@@ -74,8 +76,24 @@ export default function Home() {
   const [selectedSneaker, setSelectedSneaker] = useState<Sneaker | null>(null);
   const [compareMode, setCompareMode] = useState(false);
   const [selectedForCompare, setSelectedForCompare] = useState<number[]>([]);
+  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
   const { favorites, toggleFavorite, removeFavorite, clearFavorites } =
     useFavorites();
+  const {
+    filters,
+    filteredSneakers,
+    filterOptions,
+    setPriceRange,
+    setPremiumRange,
+    toggleUse,
+    toggleBrand,
+    toggleStyle,
+    toggleDemandLevel,
+    toggleGender,
+    toggleStatus,
+    resetFilters,
+    hasActiveFilters,
+  } = useAdvancedFilters();
 
   const brands = useMemo(() => {
     const uniqueBrands = new Set(sneakersData.map((s) => s.brand));
@@ -83,7 +101,7 @@ export default function Home() {
   }, []);
 
   const filteredData = useMemo(() => {
-    let data = [...sneakersData];
+    let data = [...filteredSneakers];
 
     if (searchTerm) {
       const lowerTerm = searchTerm.toLowerCase();
@@ -219,6 +237,17 @@ export default function Home() {
             />
 
             <Button
+              onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
+              className={`rounded-none border-2 font-mono text-xs font-bold ${
+                hasActiveFilters
+                  ? "border-primary bg-primary text-primary-foreground hover:bg-primary/90"
+                  : "border-border bg-card hover:bg-muted text-foreground"
+              }`}
+            >
+              ⚙️ FILTERS {hasActiveFilters && "(ACTIVE)"}
+            </Button>
+
+            <Button
               onClick={() => setLocation("/rankings")}
               className="rounded-none border-2 border-border bg-secondary hover:bg-secondary/90 text-secondary-foreground font-mono text-xs font-bold"
             >
@@ -234,6 +263,28 @@ export default function Home() {
           </div>
         </div>
       </header>
+
+      {showAdvancedFilters && (
+        <div className="border-b-2 border-border bg-muted/10 border-t-2">
+          <div className="container py-6">
+            <AdvancedFilterPanel
+              filters={filters}
+              filterOptions={filterOptions}
+              onPriceRangeChange={setPriceRange}
+              onPremiumRangeChange={setPremiumRange}
+              onToggleUse={toggleUse}
+              onToggleBrand={toggleBrand}
+              onToggleStyle={toggleStyle}
+              onToggleDemandLevel={toggleDemandLevel}
+              onToggleGender={toggleGender}
+              onToggleStatus={toggleStatus}
+              onReset={resetFilters}
+              hasActiveFilters={hasActiveFilters}
+              resultCount={filteredData.length}
+            />
+          </div>
+        </div>
+      )}
 
       {selectedForCompare.length > 0 && (
         <div className="border-b-2 border-border bg-accent/30 border-t-2">
